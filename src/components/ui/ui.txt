@@ -1,0 +1,11 @@
+This folder mainly focus on
+
+Pure reusable UI components.
+
+EX.
+ - Button
+ - Input
+ - Card
+ - Modal
+
+ These should NOT contain business logic

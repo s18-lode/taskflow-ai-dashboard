@@ -1,0 +1,7 @@
+Application layout components.
+
+Examples:
+
+- Sidebar
+- Navbar
+- DashboardLayout
