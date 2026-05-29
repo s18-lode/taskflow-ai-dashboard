@@ -1,6 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchTasks, Task } from "@/services/task-service";
 
+
+// /API state in Redux
 interface TaskState {
     tasks: Task[];
     loading: boolean;
