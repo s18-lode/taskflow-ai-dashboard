@@ -1,5 +1,8 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { fetchTasks, Task } from "@/services/task-service";
+import { stat } from "fs";
+import { act } from "react";
+import { actionAsyncStorage } from "next/dist/server/app-render/action-async-storage.external";
 
 
 // /API state in Redux
@@ -33,7 +36,37 @@ const taskSlice = createSlice({
 
     initialState,
 
-    reducers: {},
+    reducers: {
+        addTask: (state, action) => {
+            state.tasks.push(action.payload);
+        },
+
+        toggleTask: (state, action) => {
+            const task = state.tasks.find(
+                (task) => task.id === action.payload
+            );
+
+            if (task) {
+                task.completed = !task.completed;
+            }
+        },
+
+        deleteTask: (state, action) => {
+            state.tasks = state.tasks.filter(
+                (task) => task.id !== action.payload
+            );
+        },
+
+        editTask: (state, action) => {
+            const task = state.tasks.find(
+                (task) => task.id === action.payload.id
+            );
+
+            if (task) {
+                task.title = action.payload.title;
+            }
+        },
+    },
 
     extraReducers: (builder) => {
         builder
@@ -64,5 +97,5 @@ const taskSlice = createSlice({
     },
 });
 
-
+export const { addTask, toggleTask, deleteTask, editTask } = taskSlice.actions
 export default taskSlice.reducer

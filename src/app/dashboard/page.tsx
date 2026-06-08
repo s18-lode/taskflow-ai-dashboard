@@ -2,12 +2,14 @@
 
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
+import AddTaskForm from "@/components/tasks/AddTaskForm";
 import { useEffect } from "react";
-import { getTasks } from "@/redux/slices/task-slice";
+import { getTasks, toggleTask, deleteTask, editTask } from "@/redux/slices/task-slice";
 import {
   useAppDispatch,
   useAppSelector,
 } from "@/redux/hooks";
+import { Button } from "@/components/ui/button";
 
 
 export default function DashboardPage() {
@@ -106,14 +108,17 @@ export default function DashboardPage() {
               {completionRate}%
             </p>
           </div>
-          <p className="mb-4 text-white">
+          {/* <p className="mb-4 text-white">
             Tasks Count: {tasks.length}
-          </p>
+          </p> */}
         </div>
+
 
         {/* All Task from Data */}
 
         <div className="mt-8 rounded-2xl border border-gray-800 bg-gray-900 p-6">
+          {/* Add Task */}
+          <AddTaskForm />
 
           <h2 className="mb-4 text-xl font-semibold text-white">
             Recent Tasks
@@ -126,21 +131,71 @@ export default function DashboardPage() {
                 key={task.id}
                 className="flex items-center justify-between rounded-lg border border-gray-800 p-4"
               >
-                <p className="text-white">
-                  {task.title}
-                </p>
+                <div>
+                  <p className="text-white">
+                    {task.title}
+                  </p>
+                </div>
 
-                <span
-                  className={`rounded-full px-3 py-1 text-sm ${task.completed
+                <div className="flex items-center gap-3">
+                  <span
+                    className={`rounded-full px-3 py-1 text-sm ${task.completed
                       ? "bg-green-600"
                       : "bg-yellow-600"
-                    }`}
-                >
-                  {task.completed
-                    ? "Completed"
-                    : "Pending"}
-                </span>
+                      }`}
+                  >
+                    {task.completed
+                      ? "Completed"
+                      : "Pending"}
+                  </span>
+
+                  {/* Toggle tasl completed/pending */}
+                  <Button
+                    onClick={() =>
+                      dispatch(toggleTask(task.id))
+                    }
+                    className="rounded-full px-3 py-1 text-sm"
+                  >
+                    Toggle
+                  </Button>
+
+                  {/* Edit the task */}
+                  <Button
+                    onClick={() => {
+                      const newTitle = prompt(
+                        "Edit Task",
+                        task.title
+                      );
+
+                      if (
+                        newTitle &&
+                        newTitle.trim()
+                      ) {
+                        dispatch(
+                          editTask({
+                            id: task.id,
+                            title: newTitle,
+                          })
+                        );
+                      }
+                    }}
+                    className="rounded-full px-3 py-1 text-sm"
+                  >
+                    Edit
+                  </Button>
+
+                  {/* Delete the task */}
+                  <Button
+                    onClick={() => {
+                      dispatch(deleteTask(task.id));
+                    }}
+                    className="rounded-full px-3 py-1 text-sm"
+                  >
+                    Delete
+                  </Button>
+                </div>
               </div>
+
             ))}
 
           </div>
