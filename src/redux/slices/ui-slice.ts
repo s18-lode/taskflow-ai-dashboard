@@ -36,5 +36,3 @@ export const {
 } = uiSlice.actions;
 
 export default uiSlice.reducer;
-
-//first UI toggle feature 

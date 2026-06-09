@@ -1,7 +1,7 @@
 "use client";
 
 import { LogOut, Menu, } from "lucide-react";
-import { useDispatch } from "react-redux";
+import { useAppDispatch } from "@/redux/hooks";
 import { toggleSidebar } from "@/redux/slices/ui-slice";
 import { signOut } from "firebase/auth";
 import { useRouter } from "next/navigation";
@@ -13,7 +13,7 @@ export function Navbar() {
 
   const router = useRouter();
 
-  const dispatch = useDispatch();
+  const dispatch = useAppDispatch();
 
   const handleLogout = async () => {
     try {

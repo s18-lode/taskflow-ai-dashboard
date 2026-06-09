@@ -5,8 +5,8 @@ import {
     BarChart3,
   } from "lucide-react";
 
-import { useSelector } from "react-redux";
-  
+  import { useAppSelector } from "@/redux/hooks";
+
   const menuItems = [
     {
       label: "Dashboard",
@@ -27,7 +27,7 @@ import { useSelector } from "react-redux";
   ];
   
   export function Sidebar() {
-    const isSidebarOpen = useSelector(
+    const isSidebarOpen = useAppSelector(
       (state: any) => state.ui.isSidebarOpen
     );
 
