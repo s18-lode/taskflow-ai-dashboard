@@ -1,34 +1,40 @@
-import { resolve } from "path";
+import { supabase } from "@/lib/supabase";
+import { Task } from "@/types/task";
+import { title } from "process";
 
-export interface Task {
-    id: number;
-    title: string;
-    completed: boolean;
-}
 
-const mockTasks: Task[] = [
-    // Temporary fake backend data.
-    {
-        id: 1,
-        title: "Build dashboard UI",
-        completed: true,
-    },
-    {
-        id: 2,
-        title: "Setup Redux Toolkit",
-        completed: true,
-    },
-    {
-        id: 3,
-        title: "Implement task API",
-        completed: false,
-    },
-]
+//fetch all created data from supabase
+export const fetchTasks = async (): Promise<Task[]> => {
+    const { data, error } = await supabase
+        .from("tasks")
+        .select("*")
+    // console.log("DATA:", data);
+    // console.log("ERROR:", error);
 
-export const fetchTasks = async () => {
-    return new Promise<Task[]>((resolve) => {
-        setTimeout(() => {
-            resolve(mockTasks);
-        }, 1500);
-    });
+    if (error) {
+        throw new Error(error.message);
+    }
+
+    return data || [];
+};
+
+//Create Data and add to table in supabase
+export const createTasks = async (
+    title: string
+) => {
+    const { data, error } = await supabase
+        .from("tasks")
+        .insert([
+            {
+                title,
+                completed: false,
+            }
+        ])
+        .select();
+
+    if (error) {
+        throw new Error(error.message);
+    }
+    return data;
+
 };

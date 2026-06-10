@@ -1,8 +1,10 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { fetchTasks, Task } from "@/services/task-service";
+import { createTasks, fetchTasks } from "@/services/task-service";
 import { stat } from "fs";
 import { act } from "react";
 import { actionAsyncStorage } from "next/dist/server/app-render/action-async-storage.external";
+import { Task } from "@/types/task";
+import { create } from "domain";
 
 
 // /API state in Redux
@@ -18,7 +20,7 @@ const initialState: TaskState = {
     error: null,
 };
 
-
+//fetch all created data 
 export const getTasks =
     createAsyncThunk(
         "tasks/getTasks",
@@ -28,6 +30,17 @@ export const getTasks =
                 await fetchTasks();
 
             return response;
+        }
+    )
+
+//add new task and newaly added fetch getTasks
+export const addTaskAsync =
+    createAsyncThunk(
+        "tasks/addTask",
+
+        async (title: string, { dispatch }) => {
+            await createTasks(title);
+            dispatch(getTasks());
         }
     )
 

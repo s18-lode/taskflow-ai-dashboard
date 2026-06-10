@@ -2,7 +2,7 @@
 
 import { ProtectedRoute } from "@/components/auth/protected-route";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
-import AddTaskForm from "@/components/tasks/AddTaskForm";
+import AddTaskForm from "@/components/forms/AddTaskForm";
 import { useEffect } from "react";
 import { getTasks, toggleTask, deleteTask, editTask } from "@/redux/slices/task-slice";
 import {
