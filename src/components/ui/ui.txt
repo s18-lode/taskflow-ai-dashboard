@@ -9,3 +9,38 @@ EX.
  - Modal
 
  These should NOT contain business logic
+
+
+
+
+//gemini 
+Build AI
+
+Here's the architecture we'll follow:
+
+User
+   │
+   ▼
+Clicks "🤖 Generate"
+   │
+   ▼
+React (TaskRow)
+   │
+   ▼
+Next.js API Route
+/api/ai/generate-subtasks
+   │
+   ▼
+Gemini API
+   │
+   ▼
+Structured JSON Response
+   │
+   ▼
+Redux
+   │
+   ▼
+Supabase
+   │
+   ▼
+Dashboard Updates

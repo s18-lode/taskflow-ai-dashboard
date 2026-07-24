@@ -1,10 +1,7 @@
 import { createAsyncThunk, createSlice } from "@reduxjs/toolkit";
-import { createTasks, fetchTasks } from "@/services/task-service";
-import { stat } from "fs";
-import { act } from "react";
-import { actionAsyncStorage } from "next/dist/server/app-render/action-async-storage.external";
+import { createTasks, fetchTasks, updateTaskStatus, deleteTaskById, editTaskTitle } from "@/services/task-service";
 import { Task } from "@/types/task";
-import { create } from "domain";
+import { use } from "react";
 
 
 // /API state in Redux
@@ -25,9 +22,9 @@ export const getTasks =
     createAsyncThunk(
         "tasks/getTasks",
 
-        async () => {
+        async (userId: string) => {
             const response =
-                await fetchTasks();
+                await fetchTasks(userId);
 
             return response;
         }
@@ -38,48 +35,97 @@ export const addTaskAsync =
     createAsyncThunk(
         "tasks/addTask",
 
-        async (title: string, { dispatch }) => {
-            await createTasks(title);
-            dispatch(getTasks());
+        async (
+            {
+                title,
+                userId,
+                parentId = null,
+            }: {
+                title: string,
+                userId: string,
+                parentId?: number | null;
+            },
+            { dispatch }
+        ) => {
+            await createTasks(title, userId, parentId);
+            dispatch(getTasks(userId));
         }
     )
+
+export const toggleTaskAsync =
+    createAsyncThunk(
+        "tasks/toggleTask",
+        async (
+            {
+                id,
+                completed,
+                userId,
+            }: {
+                id: number,
+                completed: boolean;
+                userId: string
+            },
+            { dispatch }
+        ) => {
+            await updateTaskStatus(
+                id,
+                completed,
+            );
+
+            dispatch(getTasks(userId));
+        }
+    )
+
+
+export const deleteTaskAsync =
+    createAsyncThunk(
+        "tasks/deleteTask",
+
+        async (
+            {
+                id,
+                userId
+            }: {
+                id: number,
+                userId: string
+            },
+            { dispatch }
+        ) => {
+            await deleteTaskById(id);
+
+            dispatch(getTasks(userId))
+        }
+    );
+
+export const editTaskAsync =
+    createAsyncThunk(
+        "tasks/editTask",
+
+        async (
+            {
+                id,
+                title,
+                userId,
+            }: {
+                id: number,
+                title: string,
+                userId: string
+            },
+            { dispatch }
+        ) => {
+            await editTaskTitle(id, title);
+
+            dispatch(getTasks(userId))
+
+        }
+    );
 
 const taskSlice = createSlice({
     name: "tasks",
 
     initialState,
 
-    reducers: {
-        addTask: (state, action) => {
-            state.tasks.push(action.payload);
-        },
-
-        toggleTask: (state, action) => {
-            const task = state.tasks.find(
-                (task) => task.id === action.payload
-            );
-
-            if (task) {
-                task.completed = !task.completed;
-            }
-        },
-
-        deleteTask: (state, action) => {
-            state.tasks = state.tasks.filter(
-                (task) => task.id !== action.payload
-            );
-        },
-
-        editTask: (state, action) => {
-            const task = state.tasks.find(
-                (task) => task.id === action.payload.id
-            );
-
-            if (task) {
-                task.title = action.payload.title;
-            }
-        },
-    },
+    reducers: {},
 
     extraReducers: (builder) => {
         builder
@@ -110,5 +156,4 @@ const taskSlice = createSlice({
     },
 });
 
-export const { addTask, toggleTask, deleteTask, editTask } = taskSlice.actions
 export default taskSlice.reducer

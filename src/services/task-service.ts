@@ -1,13 +1,19 @@
 import { supabase } from "@/lib/supabase";
 import { Task } from "@/types/task";
-import { title } from "process";
+
 
 
 //fetch all created data from supabase
-export const fetchTasks = async (): Promise<Task[]> => {
+export const fetchTasks = async (
+    userId: string
+): Promise<Task[]> => {
     const { data, error } = await supabase
         .from("tasks")
         .select("*")
+        .eq("user_id", userId)
+        .order("id", {
+            ascending: true,
+        })
     // console.log("DATA:", data);
     // console.log("ERROR:", error);
 
@@ -20,7 +26,9 @@ export const fetchTasks = async (): Promise<Task[]> => {
 
 //Create Data and add to table in supabase
 export const createTasks = async (
-    title: string
+    title: string,
+    userId: string,
+    parentId: number | null = null
 ) => {
     const { data, error } = await supabase
         .from("tasks")
@@ -28,6 +36,8 @@ export const createTasks = async (
             {
                 title,
                 completed: false,
+                user_id: userId,
+                parent_id: parentId,
             }
         ])
         .select();
@@ -36,5 +46,55 @@ export const createTasks = async (
         throw new Error(error.message);
     }
     return data;
-
 };
+
+// Update Task based on user edit task.
+export const updateTaskStatus = async (
+    id: number,
+    completed: boolean
+) => {
+    const { error } = await supabase
+        .from("tasks")
+        .update({
+            completed
+        })
+        .eq("id", id);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+//Delete task based on id
+export const deleteTaskById = async (
+    id: number,
+) => {
+    const { error } = await supabase
+        .from("tasks")
+        .delete()
+        .eq("id", id);
+
+    if (error) {
+        throw new Error(error.message);
+    }
+};
+
+
+//edit Task bases on id, and title.
+
+export const editTaskTitle = async (
+    id: number,
+    title: string,
+) => {
+    const { error } = await supabase
+        .from("tasks")
+        .update({
+            title,
+        })
+        .eq("id", id)
+
+    if (error) {
+        throw new Error(error.message)
+    }
+}

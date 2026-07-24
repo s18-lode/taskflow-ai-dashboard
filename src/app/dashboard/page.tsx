@@ -4,17 +4,19 @@ import { ProtectedRoute } from "@/components/auth/protected-route";
 import { DashboardLayout } from "@/components/layout/dashboard-layout";
 import AddTaskForm from "@/components/forms/AddTaskForm";
 import { useEffect } from "react";
-import { getTasks, toggleTask, deleteTask, editTask } from "@/redux/slices/task-slice";
+import { getTasks, toggleTaskAsync, deleteTaskAsync, editTaskAsync, addTaskAsync } from "@/redux/slices/task-slice";
 import {
   useAppDispatch,
   useAppSelector,
 } from "@/redux/hooks";
 import { Button } from "@/components/ui/button";
-
+import { useAuth } from "@/context/auth-context";
+import TaskList from "@/components/dashboard/TaskList";
 
 export default function DashboardPage() {
 
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
 
   const { tasks, loading, error, } = useAppSelector((state) => state.tasks);
 
@@ -36,8 +38,10 @@ export default function DashboardPage() {
 
   // useEffect runs AFTER the first render.
   useEffect(() => {
-    dispatch(getTasks());
-  }, [dispatch]);
+    if (user) {
+      dispatch(getTasks(user.uid));
+    }
+  }, [dispatch, user]);
 
   // While loading show this UI 
   if (loading) {
@@ -123,83 +127,55 @@ export default function DashboardPage() {
           <h2 className="mb-4 text-xl font-semibold text-white">
             Recent Tasks
           </h2>
+          {user && (
+            <TaskList
+              tasks={tasks}
+              userId={user.uid}
+              onToggle={(id, completed) => {
+                if (!user) return;
 
-          <div className="space-y-3">
+                dispatch(
+                  toggleTaskAsync({
+                    id,
+                    completed,
+                    userId: user.uid,
+                  })
+                );
+              }}
+              onEdit={(id, title) => {
+                if (!user) return;
 
-            {tasks.map((task) => (
-              <div
-                key={task.id}
-                className="flex items-center justify-between rounded-lg border border-gray-800 p-4"
-              >
-                <div>
-                  <p className="text-white">
-                    {task.title}
-                  </p>
-                </div>
+                dispatch(
+                  editTaskAsync({
+                    id,
+                    title,
+                    userId: user.uid,
+                  })
+                );
+              }}
+              onDelete={(id) => {
+                if (!user) return;
 
-                <div className="flex items-center gap-3">
-                  <span
-                    className={`rounded-full px-3 py-1 text-sm ${task.completed
-                      ? "bg-green-600"
-                      : "bg-yellow-600"
-                      }`}
-                  >
-                    {task.completed
-                      ? "Completed"
-                      : "Pending"}
-                  </span>
+                dispatch(
+                  deleteTaskAsync({
+                    id,
+                    userId: user.uid,
+                  })
+                );
+              }}
+              onAddSubTask={(title, parentId) => {
+                if (!user) return;
 
-                  {/* Toggle tasl completed/pending */}
-                  <Button
-                    onClick={() =>
-                      dispatch(toggleTask(task.id))
-                    }
-                    className="rounded-full px-3 py-1 text-sm"
-                  >
-                    Toggle
-                  </Button>
-
-                  {/* Edit the task */}
-                  <Button
-                    onClick={() => {
-                      const newTitle = prompt(
-                        "Edit Task",
-                        task.title
-                      );
-
-                      if (
-                        newTitle &&
-                        newTitle.trim()
-                      ) {
-                        dispatch(
-                          editTask({
-                            id: task.id,
-                            title: newTitle,
-                          })
-                        );
-                      }
-                    }}
-                    className="rounded-full px-3 py-1 text-sm"
-                  >
-                    Edit
-                  </Button>
-
-                  {/* Delete the task */}
-                  <Button
-                    onClick={() => {
-                      dispatch(deleteTask(task.id));
-                    }}
-                    className="rounded-full px-3 py-1 text-sm"
-                  >
-                    Delete
-                  </Button>
-                </div>
-              </div>
-
-            ))}
-
-          </div>
-
+                dispatch(
+                  addTaskAsync({
+                    title,
+                    userId: user.uid,
+                    parentId,
+                  })
+                );
+              }}
+            />
+          )}
         </div>
       </DashboardLayout>
     </ProtectedRoute>
