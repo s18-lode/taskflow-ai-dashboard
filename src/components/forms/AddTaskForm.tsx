@@ -2,12 +2,13 @@
 
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useAuth } from "@/context/auth-context";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
 import { useAppDispatch } from "@/redux/hooks";
-import { addTask } from "@/redux/slices/task-slice";
+import { addTaskAsync } from "@/redux/slices/task-slice";
 
 import {
   taskSchema,
@@ -16,6 +17,7 @@ import {
 
 export default function AddTaskForm() {
   const dispatch = useAppDispatch();
+  const { user } = useAuth();
 
   const {
     register,
@@ -29,11 +31,12 @@ export default function AddTaskForm() {
   const onSubmit = (
     data: TaskFormData
   ) => {
+    if(!user) return;
+    
     dispatch(
-      addTask({
-        id: Date.now(),
+      addTaskAsync({
         title: data.title,
-        completed: false,
+        userId: user.uid
       })
     );
 

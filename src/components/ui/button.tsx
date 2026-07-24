@@ -1,10 +1,14 @@
 import { ButtonHTMLAttributes } from "react";
 import { cn } from "@/lib/utils";
+import { Grenze } from "next/font/google";
+import { MailOpenIcon } from "lucide-react";
 
 type ButtonVariant =
   | "primary"
   | "secondary"
-  | "danger";
+  | "danger"
+  |"subSecondary"
+  |"outline";
 
 type ButtonSize =
   | "sm"
@@ -28,6 +32,12 @@ const variantStyles = {
 
   danger:
     "bg-red-600 hover:bg-red-700 text-white",
+
+  subSecondary:
+    "bg-pink-600 hover:bg-pink-400 text-white hover:text-black",
+  
+  outline:
+    "border border-pink-600 text-pink-600 bg-transparent hover:bg-pink-600 hover:text-white",
 };
 
 const sizeStyles = {
